@@ -1,0 +1,785 @@
+-- Universal Hub - Script Edition
+-- Made by MtaX Scripth Co. Ltd.
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
+
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "UniversalHub"
+Gui.ResetOnSpawn = false
+Gui.Parent = PlayerGui
+
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0,650,0,400)
+Main.Position = UDim2.new(.5,-325,.5,-200)
+Main.BackgroundColor3 = Color3.fromRGB(30,30,30)
+Main.BorderSizePixel = 0
+Main.Parent = Gui
+
+Instance.new("UICorner",Main).CornerRadius = UDim.new(0,12)
+
+local Top = Instance.new("Frame")
+Top.Parent = Main
+Top.Size = UDim2.new(1,0,0,42)
+Top.BackgroundColor3 = Color3.fromRGB(20,20,20)
+Top.BorderSizePixel = 0
+Instance.new("UICorner",Top).CornerRadius = UDim.new(0,12)
+
+local Title = Instance.new("TextLabel")
+Title.Parent = Top
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1,-100,1,0)
+Title.Position = UDim2.new(0,15,0,0)
+Title.Text = "Universal Hub | Script Edition"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 20
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.TextColor3 = Color3.new(1,1,1)
+
+local Close = Instance.new("TextButton")
+Close.Parent = Top
+Close.Size = UDim2.new(0,32,0,32)
+Close.Position = UDim2.new(1,-40,.5,-16)
+Close.Text = "✕"
+Close.Font = Enum.Font.GothamBold
+Close.TextColor3 = Color3.new(1,1,1)
+Close.BackgroundColor3 = Color3.fromRGB(200,70,70)
+Instance.new("UICorner",Close)
+
+local Sidebar = Instance.new("Frame")
+Sidebar.Parent = Main
+Sidebar.Position = UDim2.new(0,0,0,42)
+Sidebar.Size = UDim2.new(0,160,1,-42)
+Sidebar.BackgroundColor3 = Color3.fromRGB(25,25,25)
+Sidebar.BorderSizePixel = 0
+
+local Layout = Instance.new("UIListLayout")
+Layout.Parent = Sidebar
+Layout.Padding = UDim.new(0,8)
+
+local Padding = Instance.new("UIPadding")
+Padding.Parent = Sidebar
+Padding.PaddingTop = UDim.new(0,12)
+
+local Content = Instance.new("Frame")
+Content.Parent = Main
+Content.Position = UDim2.new(0,170,0,52)
+Content.Size = UDim2.new(1,-180,1,-62)
+Content.BackgroundTransparency = 1
+
+local Pages = {}
+
+local function CreatePage(Name)
+	local Button = Instance.new("TextButton")
+	Button.Parent = Sidebar
+	Button.Size = UDim2.new(1,-12,0,42)
+	Button.Text = Name
+	Button.Font = Enum.Font.GothamMedium
+	Button.TextSize = 16
+	Button.TextColor3 = Color3.new(1,1,1)
+	Button.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	Instance.new("UICorner",Button)
+
+	local Page = Instance.new("Frame")
+	Page.Parent = Content
+	Page.Size = UDim2.fromScale(1,1)
+	Page.BackgroundTransparency = 1
+	Page.Visible = false
+
+	Pages[Name] = Page
+
+	Button.MouseButton1Click:Connect(function()
+		for _,v in pairs(Pages) do
+			v.Visible = false
+		end
+		Page.Visible = true
+	end)
+
+	return Page
+end
+
+local Home = CreatePage("🏠 Home")
+local NPCs = CreatePage("👾 NPCs")
+local Settings = CreatePage("⚙️ Settings")
+local About = CreatePage("ℹ️ About")
+
+Pages["🏠 Home"].Visible = true
+
+Close.MouseButton1Click:Connect(function()
+	Gui:Destroy()
+end)
+
+-- Drag
+local Drag = false
+local DragStart
+local StartPos
+
+Top.InputBegan:Connect(function(Input)
+	if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+		Drag = true
+		DragStart = Input.Position
+		StartPos = Main.Position
+	end
+end)
+
+UIS.InputEnded:Connect(function(Input)
+	if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+		Drag = false
+	end
+end)
+
+UIS.InputChanged:Connect(function(Input)
+	if Drag and Input.UserInputType == Enum.UserInputType.MouseMovement then
+		local Delta = Input.Position - DragStart
+		Main.Position = UDim2.new(
+			StartPos.X.Scale,
+			StartPos.X.Offset + Delta.X,
+			StartPos.Y.Scale,
+			StartPos.Y.Offset + Delta.Y
+		)
+	end
+end)
+-------------------------------------------------
+-- PARTE 2 - PAGES
+-------------------------------------------------
+
+local EnemyFolder = workspace:FindFirstChild("Enemies")
+
+local CurrentTarget
+local Highlight
+
+-------------------------------------------------
+-- HOME
+-------------------------------------------------
+
+local Welcome = Instance.new("TextLabel")
+Welcome.Parent = Home
+Welcome.Size = UDim2.new(1,0,0,40)
+Welcome.BackgroundTransparency = 1
+Welcome.Font = Enum.Font.GothamBold
+Welcome.TextSize = 26
+Welcome.TextColor3 = Color3.new(1,1,1)
+Welcome.Text = "Welcome!"
+
+local Info = Instance.new("TextLabel")
+Info.Parent = Home
+Info.Position = UDim2.new(0,0,0,45)
+Info.Size = UDim2.new(1,0,0,70)
+Info.BackgroundTransparency = 1
+Info.TextWrapped = true
+Info.Font = Enum.Font.Gotham
+Info.TextSize = 16
+Info.TextColor3 = Color3.fromRGB(210,210,210)
+Info.Text =
+"Universal Hub\nDevelopment Panel for Roblox Studio"
+
+-------------------------------------------------
+-- NPC PAGE
+-------------------------------------------------
+
+local NPCTitle = Instance.new("TextLabel")
+NPCTitle.Parent = NPCs
+NPCTitle.Size = UDim2.new(1,0,0,35)
+NPCTitle.BackgroundTransparency = 1
+NPCTitle.Font = Enum.Font.GothamBold
+NPCTitle.TextSize = 22
+NPCTitle.Text = "NPC Manager"
+NPCTitle.TextColor3 = Color3.new(1,1,1)
+
+local Status = Instance.new("TextLabel")
+Status.Parent = NPCs
+Status.Position = UDim2.new(0,0,0,40)
+Status.Size = UDim2.new(1,0,0,30)
+Status.BackgroundTransparency = 1
+Status.Font = Enum.Font.Gotham
+Status.TextColor3 = Color3.fromRGB(220,220,220)
+Status.Text = "Current Target: None"
+
+local Health = Instance.new("TextLabel")
+Health.Parent = NPCs
+Health.Position = UDim2.new(0,0,0,70)
+Health.Size = UDim2.new(1,0,0,30)
+Health.BackgroundTransparency = 1
+Health.Font = Enum.Font.Gotham
+Health.TextColor3 = Color3.fromRGB(120,255,120)
+Health.Text = "Health: -"
+
+local function Button(text,y)
+
+	local b = Instance.new("TextButton")
+	b.Parent = NPCs
+	b.Size = UDim2.new(0,220,0,36)
+	b.Position = UDim2.new(0,0,0,y)
+	b.BackgroundColor3 = Color3.fromRGB(45,45,45)
+	b.TextColor3 = Color3.new(1,1,1)
+	b.Font = Enum.Font.GothamBold
+	b.TextSize = 16
+	b.Text = text
+
+	Instance.new("UICorner",b)
+
+	return b
+
+end
+
+local SelectButton = Button("Select Closest NPC",120)
+local HighlightButton = Button("Toggle Highlight",170)
+
+-------------------------------------------------
+-- NPC FUNCTIONS
+-------------------------------------------------
+
+local function ClosestNPC()
+
+	if not EnemyFolder then
+		return nil
+	end
+
+	local Root = Player.Character
+		and Player.Character:FindFirstChild("HumanoidRootPart")
+
+	if not Root then
+		return nil
+	end
+
+	local Closest
+	local Distance = math.huge
+
+	for _,npc in ipairs(EnemyFolder:GetChildren()) do
+
+		local HRP = npc:FindFirstChild("HumanoidRootPart")
+		local Hum = npc:FindFirstChildOfClass("Humanoid")
+
+		if HRP and Hum and Hum.Health>0 then
+
+			local d = (HRP.Position-Root.Position).Magnitude
+
+			if d<Distance then
+				Distance=d
+				Closest=npc
+			end
+
+		end
+
+	end
+
+	return Closest
+
+end
+
+SelectButton.MouseButton1Click:Connect(function()
+
+	CurrentTarget=ClosestNPC()
+
+	if CurrentTarget then
+
+		Status.Text="Current Target: "..CurrentTarget.Name
+
+		local Hum=CurrentTarget:FindFirstChildOfClass("Humanoid")
+
+		if Hum then
+			Health.Text="Health: "..math.floor(Hum.Health)
+		end
+
+	else
+
+		Status.Text="Current Target: None"
+
+	end
+
+end)
+
+HighlightButton.MouseButton1Click:Connect(function()
+
+	if not CurrentTarget then
+		return
+	end
+
+	if Highlight then
+		Highlight:Destroy()
+		Highlight=nil
+		return
+	end
+
+	Highlight=Instance.new("Highlight")
+	Highlight.FillTransparency=.5
+	Highlight.OutlineTransparency=0
+	Highlight.Adornee=CurrentTarget
+	Highlight.Parent=CurrentTarget
+
+end)
+
+-------------------------------------------------
+-- SETTINGS
+-------------------------------------------------
+
+local SettingText=Instance.new("TextLabel")
+SettingText.Parent=Settings
+SettingText.Size=UDim2.new(1,0,0,40)
+SettingText.BackgroundTransparency=1
+SettingText.Font=Enum.Font.GothamBold
+SettingText.TextSize=22
+SettingText.Text="Settings"
+SettingText.TextColor3=Color3.new(1,1,1)
+
+-------------------------------------------------
+-- ABOUT
+-------------------------------------------------
+
+local AboutText=Instance.new("TextLabel")
+AboutText.Parent=About
+AboutText.Size=UDim2.new(1,-20,1,-20)
+AboutText.Position=UDim2.new(0,10,0,10)
+AboutText.BackgroundTransparency=1
+AboutText.TextWrapped=true
+AboutText.Font=Enum.Font.Gotham
+AboutText.TextSize=18
+AboutText.TextColor3=Color3.new(1,1,1)
+
+AboutText.Text=[[
+Universal Hub
+
+Script Edition
+
+Version 1.0
+
+Made by
+MtaX Scripth Co. Ltd.
+]]
+-------------------------------------------------
+-- PARTE 3 - EXTRAS
+-------------------------------------------------
+
+-------------------------------------------------
+-- NOTIFICATIONS
+-------------------------------------------------
+
+local Notification = Instance.new("TextLabel")
+Notification.Parent = Gui
+Notification.AnchorPoint = Vector2.new(.5,0)
+Notification.Position = UDim2.new(.5,0,0,-60)
+Notification.Size = UDim2.new(0,300,0,40)
+Notification.BackgroundColor3 = Color3.fromRGB(35,35,35)
+Notification.TextColor3 = Color3.new(1,1,1)
+Notification.Font = Enum.Font.GothamBold
+Notification.TextSize = 16
+Notification.Visible = false
+Instance.new("UICorner", Notification)
+
+local function Notify(text)
+
+	Notification.Text = text
+	Notification.Visible = true
+
+	TweenService:Create(
+		Notification,
+		TweenInfo.new(.25),
+		{Position = UDim2.new(.5,0,0,15)}
+	):Play()
+
+	task.delay(2.5,function()
+
+		TweenService:Create(
+			Notification,
+			TweenInfo.new(.25),
+			{Position = UDim2.new(.5,0,0,-60)}
+		):Play()
+
+		task.wait(.3)
+		Notification.Visible = false
+
+	end)
+
+end
+
+-------------------------------------------------
+-- SETTINGS BUTTONS
+-------------------------------------------------
+
+local DarkMode = true
+
+local ThemeButton = Instance.new("TextButton")
+ThemeButton.Parent = Settings
+ThemeButton.Size = UDim2.new(0,220,0,36)
+ThemeButton.Position = UDim2.new(0,0,0,50)
+ThemeButton.Text = "Toggle Theme"
+ThemeButton.Font = Enum.Font.GothamBold
+ThemeButton.TextSize = 16
+ThemeButton.TextColor3 = Color3.new(1,1,1)
+ThemeButton.BackgroundColor3 = Color3.fromRGB(45,45,45)
+Instance.new("UICorner", ThemeButton)
+
+ThemeButton.MouseButton1Click:Connect(function()
+
+	DarkMode = not DarkMode
+
+	if DarkMode then
+
+		Main.BackgroundColor3 = Color3.fromRGB(30,30,30)
+		Sidebar.BackgroundColor3 = Color3.fromRGB(25,25,25)
+		Top.BackgroundColor3 = Color3.fromRGB(20,20,20)
+
+		Notify("Dark Theme Enabled")
+
+	else
+
+		Main.BackgroundColor3 = Color3.fromRGB(235,235,235)
+		Sidebar.BackgroundColor3 = Color3.fromRGB(220,220,220)
+		Top.BackgroundColor3 = Color3.fromRGB(210,210,210)
+
+		Notify("Light Theme Enabled")
+
+	end
+
+end)
+
+-------------------------------------------------
+-- PAGE ANIMATION
+-------------------------------------------------
+
+for _,Page in pairs(Pages) do
+	Page:GetPropertyChangedSignal("Visible"):Connect(function()
+
+		if Page.Visible then
+
+			Page.Position = UDim2.new(.05,0,0,0)
+
+			TweenService:Create(
+				Page,
+				TweenInfo.new(.2),
+				{Position = UDim2.new(0,0,0,0)}
+			):Play()
+
+		end
+
+	end)
+end
+
+-------------------------------------------------
+-- AUTO UPDATE NPC HEALTH
+-------------------------------------------------
+
+task.spawn(function()
+
+	while Gui.Parent do
+
+		task.wait(.15)
+
+		if CurrentTarget then
+
+			local Humanoid =
+				CurrentTarget:FindFirstChildOfClass("Humanoid")
+
+			if Humanoid then
+
+				Health.Text =
+					"Health: "..math.floor(Humanoid.Health)
+
+				if Humanoid.Health <= 0 then
+
+					Status.Text = "Current Target: None"
+					Health.Text = "Health: -"
+
+					if Highlight then
+						Highlight:Destroy()
+						Highlight = nil
+					end
+
+					CurrentTarget = nil
+
+					Notify("Target defeated")
+
+				end
+
+			end
+
+		end
+
+	end
+
+end)
+
+-------------------------------------------------
+-- STARTUP
+-------------------------------------------------
+
+Notify("Universal Hub Loaded")
+-------------------------------------------------
+-- PARTE 4 - NPC LIST SYSTEM
+-------------------------------------------------
+
+local NPCList = Instance.new("ScrollingFrame")
+NPCList.Parent = NPCs
+NPCList.Position = UDim2.new(0,250,0,40)
+NPCList.Size = UDim2.new(0,220,0,230)
+NPCList.BackgroundColor3 = Color3.fromRGB(35,35,35)
+NPCList.BorderSizePixel = 0
+NPCList.CanvasSize = UDim2.new(0,0,0,0)
+
+Instance.new("UICorner", NPCList)
+
+local ListLayout = Instance.new("UIListLayout")
+ListLayout.Parent = NPCList
+ListLayout.Padding = UDim.new(0,5)
+
+local Refresh = Instance.new("TextButton")
+Refresh.Parent = NPCs
+Refresh.Size = UDim2.new(0,220,0,35)
+Refresh.Position = UDim2.new(0,250,0,5)
+Refresh.Text = "Refresh NPC List"
+Refresh.Font = Enum.Font.GothamBold
+Refresh.TextSize = 15
+Refresh.TextColor3 = Color3.new(1,1,1)
+Refresh.BackgroundColor3 = Color3.fromRGB(45,45,45)
+
+Instance.new("UICorner",Refresh)
+
+local Clear = Instance.new("TextButton")
+Clear.Parent = NPCs
+Clear.Size = UDim2.new(0,220,0,35)
+Clear.Position = UDim2.new(0,0,0,220)
+Clear.Text = "Clear Target"
+Clear.Font = Enum.Font.GothamBold
+Clear.TextSize = 15
+Clear.TextColor3 = Color3.new(1,1,1)
+Clear.BackgroundColor3 = Color3.fromRGB(100,50,50)
+
+Instance.new("UICorner",Clear)
+
+
+local function ClearList()
+
+	for _,v in pairs(NPCList:GetChildren()) do
+		if v:IsA("TextButton") then
+			v:Destroy()
+		end
+	end
+
+end
+
+
+local function LoadNPCs()
+
+	ClearList()
+
+	if not EnemyFolder then
+		Notify("Enemies folder not found")
+		return
+	end
+
+
+	for _,npc in ipairs(EnemyFolder:GetChildren()) do
+
+		local Button = Instance.new("TextButton")
+		Button.Parent = NPCList
+		Button.Size = UDim2.new(1,-10,0,35)
+		Button.Text = npc.Name
+		Button.Font = Enum.Font.Gotham
+		Button.TextSize = 14
+		Button.TextColor3 = Color3.new(1,1,1)
+		Button.BackgroundColor3 = Color3.fromRGB(55,55,55)
+
+		Instance.new("UICorner",Button)
+
+
+		Button.MouseButton1Click:Connect(function()
+
+			CurrentTarget = npc
+
+			Status.Text =
+				"Current Target: "..npc.Name
+
+
+			local Hum =
+				npc:FindFirstChildOfClass("Humanoid")
+
+			if Hum then
+				Health.Text =
+					"Health: "..math.floor(Hum.Health)
+			end
+
+
+			Notify("Selected "..npc.Name)
+
+		end)
+
+	end
+
+
+	task.wait()
+
+	NPCList.CanvasSize =
+		UDim2.new(
+			0,
+			0,
+			0,
+			ListLayout.AbsoluteContentSize.Y + 10
+		)
+
+end
+
+
+Refresh.MouseButton1Click:Connect(function()
+
+	LoadNPCs()
+	Notify("NPC list updated")
+
+end)
+
+
+Clear.MouseButton1Click:Connect(function()
+
+	CurrentTarget = nil
+
+	if Highlight then
+		Highlight:Destroy()
+		Highlight=nil
+	end
+
+	Status.Text="Current Target: None"
+	Health.Text="Health: -"
+
+	Notify("Target cleared")
+
+end)
+
+
+LoadNPCs()
+-------------------------------------------------
+-- PARTE 5 FINAL - FINAL POLISH
+-------------------------------------------------
+
+local Open = true
+
+-------------------------------------------------
+-- OPEN / CLOSE HOTKEY
+-------------------------------------------------
+
+UIS.InputBegan:Connect(function(input, processed)
+
+	if processed then return end
+
+	if input.KeyCode == Enum.KeyCode.RightShift then
+
+		Open = not Open
+
+		if Open then
+
+			Main.Visible = true
+
+			Main.Size = UDim2.new(0,0,0,0)
+
+			TweenService:Create(
+				Main,
+				TweenInfo.new(.3, Enum.EasingStyle.Back),
+				{
+					Size = UDim2.new(0,650,0,400)
+				}
+			):Play()
+
+		else
+
+			Main.Visible = false
+
+		end
+
+	end
+
+end)
+
+
+-------------------------------------------------
+-- MOBILE BUTTON
+-------------------------------------------------
+
+local MobileButton = Instance.new("TextButton")
+MobileButton.Parent = Gui
+MobileButton.Size = UDim2.new(0,60,0,60)
+MobileButton.Position = UDim2.new(0,20,0.5,-30)
+MobileButton.Text = "UH"
+MobileButton.Font = Enum.Font.GothamBold
+MobileButton.TextSize = 20
+MobileButton.TextColor3 = Color3.new(1,1,1)
+MobileButton.BackgroundColor3 = Color3.fromRGB(35,35,35)
+
+Instance.new("UICorner",MobileButton)
+
+
+MobileButton.MouseButton1Click:Connect(function()
+
+	Open = not Open
+	Main.Visible = Open
+
+end)
+
+
+-------------------------------------------------
+-- SAVE SETTINGS (SESSION)
+-------------------------------------------------
+
+local SettingsData = {
+	Theme = "Dark",
+	Version = "1.0"
+}
+
+
+local SaveText = Instance.new("TextLabel")
+SaveText.Parent = Settings
+SaveText.Position = UDim2.new(0,0,0,100)
+SaveText.Size = UDim2.new(1,0,0,40)
+SaveText.BackgroundTransparency = 1
+SaveText.Font = Enum.Font.Gotham
+SaveText.TextSize = 16
+SaveText.TextColor3 = Color3.fromRGB(180,180,180)
+
+SaveText.Text =
+"Settings loaded\nVersion "..SettingsData.Version
+
+
+-------------------------------------------------
+-- UPDATE ABOUT
+-------------------------------------------------
+
+AboutText.Text=[[
+Universal Hub
+
+Script Edition
+
+Version 1.0
+
+Features:
+- NPC Manager
+- UI Themes
+- Notifications
+- Target Selection
+- Development Tools
+
+Made by:
+MtaX Scripth Co. Ltd.
+]]
+
+
+-------------------------------------------------
+-- START ANIMATION
+-------------------------------------------------
+
+Main.Size = UDim2.new(0,0,0,0)
+
+TweenService:Create(
+	Main,
+	TweenInfo.new(.5,Enum.EasingStyle.Back),
+	{
+		Size=UDim2.new(0,650,0,400)
+	}
+):Play()
+
+
+Notify("Universal Hub Ready")
+
+-------------------------------------------------
+-- END
+-------------------------------------------------
